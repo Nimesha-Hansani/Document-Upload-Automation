@@ -3,21 +3,34 @@ from datetime import datetime
 from dotenv import load_dotenv
 from azure.storage.blob import BlobServiceClient, BlobClient
 from azure.core.exceptions import AzureError
+from DoclLogging import AppLogger
 
 load_dotenv()
 
 class AzureBlobUploader:
-
+    
+   
 
     def __init__(self, FOLDER_PATH):
 
-        self.connection_string = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
-        self.container_name = os.getenv("AZURE_CONTAINER_NAME")
-        self.source_folder = FOLDER_PATH
+        self.log = AppLogger()
 
 
-        self.blob_service_client = BlobServiceClient.from_connection_string(self.connection_string)
-        self.container_client = self.blob_service_client.get_container_client(self.container_name)
+        try:
+
+            self.connection_string = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+            self.container_name = os.getenv("AZURE_CONTAINER_NAME")
+            self.source_folder = FOLDER_PATH
+
+
+            self.blob_service_client = BlobServiceClient.from_connection_string(self.connection_string)
+            self.container_client = self.blob_service_client.get_container_client(self.container_name)
+
+            self.log.info("Azure Client initialized successfully.")
+
+        except Exception as e :
+
+            self.log.error(f"Initialization failed: {e}")
 
     def __uploadFiles__(self):
 
@@ -38,11 +51,11 @@ class AzureBlobUploader:
                   with open(local_file_path, "rb") as data:
                         blob_client.upload_blob(data, overwrite=True)
                    
-                  print(f"Uploaded: {filename} to {blob_path}")
+                  self.log.info(f"Successfully uploaded: {filename}")
 
                 except AzureError as e:
 
-                    print("Failed to upload")
+                    self.log.error(f"Failed to upload {filename}: {e}")
 
 
 if __name__ == "__main__":
