@@ -4,7 +4,7 @@ import os
 
 class  AppLogger: 
 
-    def __init__ ( self, log_filename = "app.log"):
+    def __init__ ( self, log_filename ):
 
 
         self.logger = logging.getLogger()
